@@ -7,7 +7,7 @@ please see `Reflections <http://code.google.com/p/reflections/>`_.
 With Sclasner, you can:
 
 * Scan all .class files (including those inside .jar files in classpath),
-  then use Javassist to extract annotations
+  then use `Javassist <http://www.javassist.org/>`_ to extract annotations
 * Load all `.po files <https://github.com/ngocdaothanh/scaposer>`_
 * etc.
 
@@ -34,12 +34,12 @@ For example, if you want to load all .txt files:
 
   val acc: List[(String, String)] = Sclasner.scan(f)
 
-* ``scan`` will accummulate and return all results from ``f``.
-* ``f`` must return a list. The list may be empty (``Nil``).
-* ``container`` may be a directory or a JAR file.
-   You may call ``container.isDirectory`` or ``container.isFile`` to check.
-* ``relPath`` is path to the file you want to check, relative to ``container``.
-* ``bytesf`` returns contents of the file ``relPath`` points to.
+* ``scan`` will accummulate and return all results from ``f``
+* ``f`` must return a list. The list may be empty (``Nil``)
+* ``container`` may be a directory or a JAR file,
+  you may call ``container.isDirectory`` or ``container.isFile`` to check
+* ``relPath`` is path to the file you want to check, relative to ``container``
+* ``bytesf`` returns contents of the file ``relPath`` points to
 
 Cache
 -----
@@ -55,6 +55,7 @@ You provide the cache file name to ``scan``:
   val acc = Sclasner.scan("txts.sclasner", f)
 
 If txts.sclasner exists, ``f`` will not be run. Otherwise, ``f`` will be run and
-the result will be serialized to txts.sclasner.
+the result will be serialized to txts.sclasner. If you want to force ``f`` to
+run, just delete the cache file.
 
 Note that the result of ``f`` must be serializable.
