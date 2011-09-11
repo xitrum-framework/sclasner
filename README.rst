@@ -39,7 +39,9 @@ For example, if you want to load all .txt files:
 * ``container`` may be a directory or a JAR file,
   you may call ``container.isDirectory`` or ``container.isFile`` to check
 * ``relPath`` is path to the file you want to check, relative to ``container``
-* ``bytesf`` returns contents of the file ``relPath`` points to
+* ``bytesf`` returns contents of the file ``relPath`` points to.
+  This function should be called at most one time in ``f``, the second call will
+  return empty array.
 
 Cache
 -----
@@ -59,3 +61,34 @@ the result will be serialized to txts.sclasner. If you want to force ``f`` to
 run, just delete the cache file.
 
 Note that the result of ``f`` must be serializable.
+
+Cache in development mode
+-------------------------
+
+Suppose you are using SBT or Maven.
+
+While developing, you normally do not want to cache the result of processing the
+``target`` directory in the current working directory.
+
+If ``container`` is a subdirectory of ``target``, Sclasner will not cache the
+result of processing that ``container``. When loading the cache file, if a
+``container`` is a subdirectory of ``target``, Sclasner also run ``f`` for that
+``container``.
+
+Use with SBT
+------------
+
+Scala versions: 2.9.1.
+
+::
+
+  libraryDependencies += "tv.cntt" %% "sclasner" % "1.0"
+
+Or
+
+::
+
+  libraryDependencies += "tv.cntt" % "sclasner_2.9.1" % "1.0"
+
+Sclasner is used in `Xitrum <https://github.com/ngocdaothanh/xitrum>`_.
+

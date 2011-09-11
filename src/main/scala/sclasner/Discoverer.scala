@@ -1,7 +1,7 @@
 package sclasner
 
 import java.io.File
-import java.net.{URL, URLClassLoader}
+import java.net.{URL, URLClassLoader, URLDecoder}
 import java.util.StringTokenizer
 
 import scala.collection.mutable.{SetBuilder}
@@ -11,10 +11,23 @@ object Discoverer {
   // Use lazy to avoid Null Pointer Exception
 
   /** Each URL should point to a directory or a .jar/.zip file. */
-  lazy val urls = urlsForClassLoader ++ urlsForClasspath
+  lazy val files: List[File] = {
+    // Convert to List to prevent careless bug because Set#map returns a Set
+    val urls = (urlsForClassLoader ++ urlsForClasspath).toList
+
+    urls.foldLeft(List[File]()) { (acc, url) =>
+      if (url.getProtocol.equals("file")) {
+        val filePath = URLDecoder.decode(url.getPath, "UTF-8")
+        val file     = new File(filePath)
+        if (file.exists) acc :+ file else acc
+      } else {
+        acc
+      }
+    }
+  }
 
   // See http://code.google.com/p/reflections/source/browse/trunk/reflections/src/main/java/org/reflections/util/ClasspathHelper.java?r=129
-  lazy val urlsForClassLoader: Set[URL] = {
+  private lazy val urlsForClassLoader: Set[URL] = {
     val builder = new SetBuilder[URL, Set[URL]](Set())
 
     var loader = Thread.currentThread.getContextClassLoader
@@ -29,7 +42,7 @@ object Discoverer {
     builder.result
   }
 
-  lazy val urlsForClasspath: Set[URL] = {
+  private lazy val urlsForClasspath: Set[URL] = {
     val builder   = new SetBuilder[URL, Set[URL]](Set())
     val classpath = System.getProperty("java.class.path")
     val tokenizer = new StringTokenizer(classpath, File.pathSeparator)
