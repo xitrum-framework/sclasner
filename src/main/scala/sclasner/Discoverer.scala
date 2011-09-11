@@ -10,7 +10,7 @@ import scala.collection.mutable.{SetBuilder}
 object Discoverer {
   // Use lazy to avoid Null Pointer Exception
 
-  /** Each URL should point to a directory or a .jar/.zip file. */
+  /** Each File should point to a directory or a .jar/.zip file. */
   lazy val files: List[File] = {
     // Convert to List to prevent careless bug because Set#map returns a Set
     val urls = (urlsForClassLoader ++ urlsForClasspath).toList

@@ -100,12 +100,12 @@ object Sclasner {
 
   //----------------------------------------------------------------------------
 
-  val BUFFER_SIZE = 1024
+  private val BUFFER_SIZE = 1024
   private def readInputStream(is: InputStream): Array[Byte] = {
     var ret = Array[Byte]()
 
     var buffer = new Array[Byte](BUFFER_SIZE)
-    while (is.available > 0) {
+    while (is.available > 0) {  // "available" is not always the exact size
       val bytesRead = is.read(buffer)
       ret = ret ++ buffer.take(bytesRead)
     }
