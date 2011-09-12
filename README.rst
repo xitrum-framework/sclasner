@@ -25,8 +25,8 @@ For example, if you want to load all .txt files:
     if (entry.relPath.endsWith(".txt")) {
       val bytes    = entry.bytesf()
       val fileName = relPath.split(File.pathSeparator).last
-      val contents = new String(bytes)
-      acc :+ (fileName, contents)
+      val body     = new String(bytes)
+      acc :+ (fileName, body)
     } else {
       acc
     }
