@@ -40,7 +40,7 @@ Things in ``FileEntry``:
 * ``relPath: String``, path to the file you want to check, relative to ``container``.
 * ``bytes: Array[Byte]``, body of the file ``relPath`` points to.
   This is a lazy val, accessing the first time will make Sclasner actually read
-  the file body from dist. But because reading from disk is slow, you should avoid
+  the file body from disk. But because reading from disk is slow, you should avoid
   accessing ``bytes`` if you don't have to.
 
 ``foldLeft`` will accummulate and return results from ``f``:
