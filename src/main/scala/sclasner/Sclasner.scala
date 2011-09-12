@@ -6,7 +6,7 @@ import java.util.zip.ZipInputStream
 import scala.collection.mutable.ListBuffer
 
 object Sclasner {
-  def scan[T](cacheFileName: String, f: (File, String, () => Array[Byte]) => List[T]): List[T] = {
+  def foldLeft[T](cacheFileName: String, acc: T, f: (T, File, String, () => Array[Byte]) => T): T = {
     val targetPath = new File("target").getAbsolutePath
 
     val files = Discoverer.files
@@ -15,51 +15,50 @@ object Sclasner {
       path.startsWith(targetPath)
     }
 
-    val list1 = scan(others, cacheFileName, f)
-    val list2 = scan(subtargets, f)
-    list1 ++ list2
+    val acc2 = foldLeft(others, cacheFileName, acc, f)
+    foldLeft(subtargets, acc2, f)
   }
 
-  def scan[T](f: (File, String, () => Array[Byte]) => List[T]): List[T] = {
+  def foldLeft[T](acc: T, f: (T, File, String, () => Array[Byte]) => T): T = {
     val files = Discoverer.files
-    scan(files, f)
+    foldLeft(files, acc, f)
   }
 
   //----------------------------------------------------------------------------
 
-  private def scan[T](files: List[File], cacheFileName: String, f: (File, String, () => Array[Byte]) => List[T]): List[T] = {
+  private def foldLeft[T](files: List[File], cacheFileName: String, acc: T, f: (T, File, String, () => Array[Byte]) => T): T = {
     val file = new File(cacheFileName)
     if (file.exists()) {
       val fis  = new FileInputStream(file)
 	  val in   = new ObjectInputStream(fis)
-	  val list = in.readObject.asInstanceOf[List[T]]
+	  val acc2 = in.readObject.asInstanceOf[T]
       in.close
 
-      list
+      acc2
     } else {
-      val list = scan(files, f)
+      val acc2 = foldLeft(files, acc, f)
       val fos  = new FileOutputStream(file)
 	  val out  = new ObjectOutputStream(fos)
-	  out.writeObject(list)
+	  out.writeObject(acc2)
 	  out.close
-      list
+
+	  acc2
     }
   }
 
-  private def scan[T](files: List[File], f: (File, String, () => Array[Byte]) => List[T]): List[T] = {
-    files.foldLeft(List[T]()) { (acc, file) =>
-      val list = if (file.isDirectory) forDir(file, f) else forJar(file, f)
-      acc ++ list
+  private def foldLeft[T](files: List[File], acc: T, f: (T, File, String, () => Array[Byte]) => T): T = {
+    files.foldLeft(acc) { (acc2, file) =>
+      if (file.isDirectory) forDir(file, acc2, f) else forJar(file, acc2, f)
     }
   }
 
-  private def forDir[T](dir: File, f: (File, String, () => Array[Byte]) => List[T]): List[T] = {
-    forDir(dir, dir, f)
+  private def forDir[T](dir: File, acc: T, f: (T, File, String, () => Array[Byte]) => T): T = {
+    forDir(dir, dir, acc, f)
   }
 
-  private def forDir[T](container: File, dir: File, f: (File, String, () => Array[Byte]) => List[T]): List[T] = {
+  private def forDir[T](container: File, dir: File, acc: T, f: (T, File, String, () => Array[Byte]) => T): T = {
     val files = dir.listFiles
-    files.foldLeft(List[T]()) { (acc, fileOrDir) =>
+    files.foldLeft(acc) { (acc2, fileOrDir) =>
       if (fileOrDir.isFile) {
         val file = fileOrDir
 
@@ -71,23 +70,22 @@ object Sclasner {
         }
 
         val relPath = file.getAbsolutePath.substring(container.getAbsolutePath.length + File.pathSeparator.length)
-        acc ++ f(container, relPath, bytesf)
+        f(acc2, container, relPath, bytesf)
       } else {
-        acc ++ forDir(container, fileOrDir, f)
+        forDir(container, fileOrDir, acc2, f)
       }
     }
   }
 
-  private def forJar[T](file: File, f: (File, String, () => Array[Byte]) => List[T]): List[T] = {
-    val zip    = new ZipInputStream(new FileInputStream(file))
-    val buffer = ListBuffer[T]()
+  private def forJar[T](file: File, acc: T, f: (T, File, String, () => Array[Byte]) => T): T = {
+    val zip  = new ZipInputStream(new FileInputStream(file))
+    var acc2 = acc
 
     var entry = zip.getNextEntry
     while (entry != null) {
       if (!entry.isDirectory) {
     	val bytesf = () => readInputStream(zip)
-        val list = f(file, entry.getName, bytesf)
-        buffer ++= list
+        acc2 = f(acc2, file, entry.getName, bytesf)
       }
 
       zip.closeEntry
@@ -95,7 +93,7 @@ object Sclasner {
     }
 
     zip.close
-    buffer.toList
+    acc2
   }
 
   //----------------------------------------------------------------------------

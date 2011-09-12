@@ -21,27 +21,28 @@ For example, if you want to load all .txt files:
   import java.io.File
   import sclasner.Sclasner
 
-  def f(container: File, relPath: String, bytesf: () => Array[Byte]): List[(String, String)] = {
+  def f(acc: List[(String, String)], container: File, relPath: String, bytesf: () => Array[Byte]): List[(String, String)] = {
     if (relPath.endsWith(".txt")) {
       val bytes    = bytesf()
       val fileName = relPath.split(File.pathSeparator).last
       val contents = new String(bytes)
-      List((fileName, contents))
+      acc :+ (fileName, contents)
     } else {
-      Nil
+      acc
     }
   }
 
-  val acc: List[(String, String)] = Sclasner.scan(f)
+  val acc = Sclasner.foldLeft(List(), f)
 
-* ``scan`` will accummulate and return all results from ``f``
-* ``f`` must return a list. The list may be empty (``Nil``)
+* Signature of ``foldLeft``: ``foldLeft[T](acc: T, f: (T, File, String, () => Array[Byte]) => T): T``
+* ``foldLeft`` will accummulate and return results from ``f``
 * ``container`` may be a directory or a JAR file,
   you may call ``container.isDirectory`` or ``container.isFile`` to check
 * ``relPath`` is path to the file you want to check, relative to ``container``
 * ``bytesf`` returns contents of the file ``relPath`` points to.
   This function should be called at most one time in ``f``, the second call will
-  return empty array.
+  return empty array. Reading from disk is slow, avoid calling ``bytesf`` if you
+  don't have to.
 
 Cache
 -----
@@ -50,11 +51,11 @@ One scan may take 10-15 seconds, depending things in your classpath and your com
 spec etc. Fortunately, because things in classpath normally does not change frequently,
 you may cache the result to a file and load it later.
 
-You provide the cache file name to ``scan``:
+You provide the cache file name to ``foldLeft``:
 
 ::
 
-  val acc = Sclasner.scan("txts.sclasner", f)
+  val acc = Sclasner.foldLeft("txts.sclasner", f)
 
 If txts.sclasner exists, ``f`` will not be run. Otherwise, ``f`` will be run and
 the result will be serialized to txts.sclasner. If you want to force ``f`` to
