@@ -5,7 +5,7 @@ import java.util.zip.ZipInputStream
 
 import scala.collection.mutable.ListBuffer
 
-object Sclasner {
+object Scanner {
   def foldLeft[T](cacheFileName: String, acc: T, f: (T, FileEntry) => T): T = {
     val targetPath = new File("target").getAbsolutePath
 

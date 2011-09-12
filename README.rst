@@ -19,7 +19,7 @@ For example, if you want to load all .txt files:
 ::
 
   import java.io.File
-  import sclasner.{FileEntry, Sclasner}
+  import sclasner.{FileEntry, Scanner}
 
   def f(acc: List[(String, String)], entry: FileEntry): List[(String, String)] = {
     if (entry.relPath.endsWith(".txt")) {
@@ -31,7 +31,7 @@ For example, if you want to load all .txt files:
     }
   }
 
-  val acc = Sclasner.foldLeft(List(), f)
+  val acc = Scanner.foldLeft(List(), f)
 
 Things in ``FileEntry``:
 
@@ -39,9 +39,9 @@ Things in ``FileEntry``:
   You may call ``container.isDirectory`` or ``container.isFile``.
 * ``relPath: String``, path to the file you want to check, relative to ``container``.
 * ``bytes: Array[Byte]``, body of the file ``relPath`` points to.
-  This is a lazy val, accessing the first time will make Sclasner actually read
-  the file body from disk. But because reading from disk is slow, you should avoid
-  accessing ``bytes`` if you don't have to.
+  This is a lazy val, accessing the first time will actually read the file from
+  disk. But because reading from disk is slow, you should avoid accessing
+  ``bytes`` if you don't have to.
 
 ``foldLeft`` will accummulate and return results from ``f``:
 
@@ -60,7 +60,7 @@ You provide the cache file name to ``foldLeft``:
 
 ::
 
-  val acc = Sclasner.foldLeft("txts.sclasner", f)
+  val acc = Scanner.foldLeft("txts.sclasner", f)
 
 If txts.sclasner exists, ``f`` will not be run. Otherwise, ``f`` will be run and
 the result will be serialized to txts.sclasner. If you want to force ``f`` to
@@ -74,12 +74,12 @@ Cache in development mode
 Suppose you are using SBT or Maven.
 
 While developing, you normally do not want to cache the result of processing the
-``target`` directory in the current working directory.
+``target`` directory in the current working directory:
 
-If ``container`` is a subdirectory of ``target``, Sclasner will not cache the
-result of processing that ``container``. When loading the cache file, if a
-``container`` is a subdirectory of ``target``, Sclasner also run ``f`` for that
-``container``.
+* If ``container`` is a subdirectory of ``target``, the result of processing that
+  ``container``will not be cached.
+* When loading the cache file, if a ``container`` is a subdirectory of ``target``,
+  ``f`` will be run for that ``container``.
 
 Use with SBT
 ------------
