@@ -23,9 +23,8 @@ For example, if you want to load all .txt files:
 
   def f(acc: List[(String, String)], entry: FileEntry): List[(String, String)] = {
     if (entry.relPath.endsWith(".txt")) {
-      val bytes    = entry.bytesf()
-      val fileName = relPath.split(File.pathSeparator).last
-      val body     = new String(bytes)
+      val fileName = entry.relPath.split(File.pathSeparator).last
+      val body     = new String(entry.bytes)
       acc :+ (fileName, body)
     } else {
       acc
@@ -34,19 +33,15 @@ For example, if you want to load all .txt files:
 
   val acc = Sclasner.foldLeft(List(), f)
 
-``FileEntry``:
+Things in ``FileEntry``:
 
-::
-
-  class FileEntry(val container: File, val relPath: String, val bytesf: () => Array[Byte])
-
-* ``container`` may be a directory or a JAR file in classpath.
+* ``container: File``, may be a directory or a JAR file in classpath.
   You may call ``container.isDirectory`` or ``container.isFile``.
-* ``relPath`` is path to the file you want to check, relative to ``container``.
-* ``bytesf`` returns contents of the file ``relPath`` points to.
-  This function should be called at most one time in ``f``, the second call will
-  return empty array. Reading from disk is slow, avoid calling ``bytesf`` if you
-  don't have to.
+* ``relPath: String``, path to the file you want to check, relative to ``container``.
+* ``bytes: Array[Byte]``, body of the file ``relPath`` points to.
+  This is a lazy val, accessing the first time will make Sclasner actually read
+  the file body from dist. But because reading from disk is slow, you should avoid
+  accessing ``bytes`` if you don't have to.
 
 ``foldLeft`` will accummulate and return results from ``f``:
 
