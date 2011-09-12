@@ -19,11 +19,11 @@ For example, if you want to load all .txt files:
 ::
 
   import java.io.File
-  import sclasner.Sclasner
+  import sclasner.{FileEntry, Sclasner}
 
-  def f(acc: List[(String, String)], container: File, relPath: String, bytesf: () => Array[Byte]): List[(String, String)] = {
-    if (relPath.endsWith(".txt")) {
-      val bytes    = bytesf()
+  def f(acc: List[(String, String)], entry: FileEntry): List[(String, String)] = {
+    if (entry.relPath.endsWith(".txt")) {
+      val bytes    = entry.bytesf()
       val fileName = relPath.split(File.pathSeparator).last
       val contents = new String(bytes)
       acc :+ (fileName, contents)
@@ -34,15 +34,25 @@ For example, if you want to load all .txt files:
 
   val acc = Sclasner.foldLeft(List(), f)
 
-* Signature of ``foldLeft``: ``foldLeft[T](acc: T, f: (T, File, String, () => Array[Byte]) => T): T``
-* ``foldLeft`` will accummulate and return results from ``f``
-* ``container`` may be a directory or a JAR file,
-  you may call ``container.isDirectory`` or ``container.isFile`` to check
-* ``relPath`` is path to the file you want to check, relative to ``container``
+``FileEntry``:
+
+::
+
+  class FileEntry(val container: File, val relPath: String, val bytesf: () => Array[Byte])
+
+* ``container`` may be a directory or a JAR file in classpath.
+  You may call ``container.isDirectory`` or ``container.isFile``.
+* ``relPath`` is path to the file you want to check, relative to ``container``.
 * ``bytesf`` returns contents of the file ``relPath`` points to.
   This function should be called at most one time in ``f``, the second call will
   return empty array. Reading from disk is slow, avoid calling ``bytesf`` if you
   don't have to.
+
+``foldLeft`` will accummulate and return results from ``f``:
+
+::
+
+  foldLeft[T](acc: T, f: (T, FileEntry) => T): T
 
 Cache
 -----

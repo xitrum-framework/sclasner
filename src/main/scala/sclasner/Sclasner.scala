@@ -6,7 +6,7 @@ import java.util.zip.ZipInputStream
 import scala.collection.mutable.ListBuffer
 
 object Sclasner {
-  def foldLeft[T](cacheFileName: String, acc: T, f: (T, File, String, () => Array[Byte]) => T): T = {
+  def foldLeft[T](cacheFileName: String, acc: T, f: (T, FileEntry) => T): T = {
     val targetPath = new File("target").getAbsolutePath
 
     val files = Discoverer.files
@@ -19,14 +19,14 @@ object Sclasner {
     foldLeft(subtargets, acc2, f)
   }
 
-  def foldLeft[T](acc: T, f: (T, File, String, () => Array[Byte]) => T): T = {
+  def foldLeft[T](acc: T, f: (T, FileEntry) => T): T = {
     val files = Discoverer.files
     foldLeft(files, acc, f)
   }
 
   //----------------------------------------------------------------------------
 
-  private def foldLeft[T](files: List[File], cacheFileName: String, acc: T, f: (T, File, String, () => Array[Byte]) => T): T = {
+  private def foldLeft[T](files: List[File], cacheFileName: String, acc: T, f: (T, FileEntry) => T): T = {
     val file = new File(cacheFileName)
     if (file.exists()) {
       val fis  = new FileInputStream(file)
@@ -46,46 +46,46 @@ object Sclasner {
     }
   }
 
-  private def foldLeft[T](files: List[File], acc: T, f: (T, File, String, () => Array[Byte]) => T): T = {
+  private def foldLeft[T](files: List[File], acc: T, f: (T, FileEntry) => T): T = {
     files.foldLeft(acc) { (acc2, file) =>
       if (file.isDirectory) forDir(file, acc2, f) else forJar(file, acc2, f)
     }
   }
 
-  private def forDir[T](dir: File, acc: T, f: (T, File, String, () => Array[Byte]) => T): T = {
+  private def forDir[T](dir: File, acc: T, f: (T, FileEntry) => T): T = {
     forDir(dir, dir, acc, f)
   }
 
-  private def forDir[T](container: File, dir: File, acc: T, f: (T, File, String, () => Array[Byte]) => T): T = {
+  private def forDir[T](container: File, dir: File, acc: T, f: (T, FileEntry) => T): T = {
     val files = dir.listFiles
     files.foldLeft(acc) { (acc2, fileOrDir) =>
       if (fileOrDir.isFile) {
-        val file = fileOrDir
-
-        val bytesf = () => {
+        val file    = fileOrDir
+        val relPath = file.getAbsolutePath.substring(container.getAbsolutePath.length + File.pathSeparator.length)
+        val bytesf  = () => {
           val is = new FileInputStream(file)
           val bytes = readInputStream(is)
           is.close
           bytes
         }
-
-        val relPath = file.getAbsolutePath.substring(container.getAbsolutePath.length + File.pathSeparator.length)
-        f(acc2, container, relPath, bytesf)
+        val fileEntry = new FileEntry(container, relPath, bytesf)
+        f(acc2, fileEntry)
       } else {
         forDir(container, fileOrDir, acc2, f)
       }
     }
   }
 
-  private def forJar[T](file: File, acc: T, f: (T, File, String, () => Array[Byte]) => T): T = {
+  private def forJar[T](file: File, acc: T, f: (T, FileEntry) => T): T = {
     val zip  = new ZipInputStream(new FileInputStream(file))
     var acc2 = acc
 
     var entry = zip.getNextEntry
     while (entry != null) {
       if (!entry.isDirectory) {
-    	val bytesf = () => readInputStream(zip)
-        acc2 = f(acc2, file, entry.getName, bytesf)
+    	val bytesf    = () => readInputStream(zip)
+    	val fileEntry = new FileEntry(file, entry.getName, bytesf)
+        acc2 = f(acc2, fileEntry)
       }
 
       zip.closeEntry
