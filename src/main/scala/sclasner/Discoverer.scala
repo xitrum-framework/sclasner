@@ -26,11 +26,13 @@ object Discoverer {
     }
   }
 
+  //----------------------------------------------------------------------------
+
   // See http://code.google.com/p/reflections/source/browse/trunk/reflections/src/main/java/org/reflections/util/ClasspathHelper.java?r=129
   private lazy val urlsForClassLoader: Set[URL] = {
     val builder = new SetBuilder[URL, Set[URL]](Set())
+    var loader  = Thread.currentThread.getContextClassLoader
 
-    var loader = Thread.currentThread.getContextClassLoader
     while (loader != null) {
       if (loader.isInstanceOf[URLClassLoader]) {
         val urls = loader.asInstanceOf[URLClassLoader].getURLs
