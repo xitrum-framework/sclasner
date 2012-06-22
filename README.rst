@@ -84,7 +84,7 @@ While developing, you normally do not want to cache the result of processing the
 Use with SBT
 ------------
 
-Scala versions: 2.9.1.
+Built with Scala version 2.9.2 for Scala 2.9.x.
 
 ::
 
