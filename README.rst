@@ -77,7 +77,7 @@ While developing, you normally do not want to cache the result of processing the
 ``target`` directory in the current working directory:
 
 * If ``container`` is a subdirectory of ``target``, the result of processing that
-  ``container``will not be cached.
+  ``container`` will not be cached.
 * When loading the cache file, if a ``container`` is a subdirectory of ``target``,
   ``f`` will be run for that ``container``.
 
