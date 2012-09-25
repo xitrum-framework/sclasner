@@ -53,7 +53,7 @@ Cache
 -----
 
 One scan may take 10-15 seconds, depending things in your classpath and your computer
-spec etc. Fortunately, because things in classpath normally does not change frequently,
+spec etc. Fortunately, because things in classpath do not change frequently,
 you may cache the result to a file and load it later.
 
 You provide the cache file name to ``foldLeft``:
