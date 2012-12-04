@@ -5,13 +5,14 @@ import scala.collection.mutable.ListBuffer
 
 object Scanner {
   def foldLeft[T](cacheFileName: String, acc: T, f: (T, FileEntry) => T): T = {
-    // "target" is a directory in the current directory
+    // "target" (SBT, Maven), "build" (Gradle) are directories in the current directory
     val targetPath = new File("target").getAbsolutePath
+    val buildPath  = new File("build").getAbsolutePath
 
     val files = Discoverer.files
     val (subtargets, others) = files.partition { file =>
       val path = file.getAbsolutePath
-      path.startsWith(targetPath)
+      path.startsWith(targetPath) || path.startsWith(buildPath)
     }
 
     val acc2 = foldLeft(others, cacheFileName, acc, f)

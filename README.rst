@@ -71,15 +71,16 @@ Note that the result of ``f`` must be serializable.
 Cache in development mode
 -------------------------
 
-Suppose you are using SBT or Maven.
+Suppose you are using SBT, Maven, or Gradle.
 
-While developing, you normally do not want to cache the result of processing the
-``target`` directory in the current working directory:
+While developing, you normally do not want to cache the result of processing
+the ``target`` (SBT, Maven) directory or ``build`` (Gradle) in the current
+working directory:
 
-* If ``container`` is a subdirectory of ``target``, the result of processing that
-  ``container`` will not be cached.
-* When loading the cache file, if a ``container`` is a subdirectory of ``target``,
-  ``f`` will be run for that ``container``.
+* If ``container`` is a subdirectory of ``target`` or ``build``, the result of
+  processing that ``container`` will not be cached.
+* When loading the cache file, if a ``container`` is a subdirectory of
+  ``target`` or ``build``, ``f`` will be run for that ``container``.
 
 Use with SBT
 ------------
@@ -88,13 +89,13 @@ Built with Scala version 2.9.2 for Scala 2.9.x.
 
 ::
 
-  libraryDependencies += "tv.cntt" %% "sclasner" % "1.1"
+  libraryDependencies += "tv.cntt" %% "sclasner" % "1.2"
 
 Or
 
 ::
 
-  libraryDependencies += "tv.cntt" % "sclasner_2.9.1" % "1.1"
+  libraryDependencies += "tv.cntt" % "sclasner_2.9.2" % "1.2"
 
 Sclasner is used in `Xitrum <https://github.com/ngocdaothanh/xitrum>`_.
 
