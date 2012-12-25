@@ -85,7 +85,9 @@ working directory:
 Use with SBT
 ------------
 
-Built with Scala version 2.9.2 for Scala 2.9.x.
+Supported Scala versions: 2.9.2, 2.10.0
+
+Ex:
 
 ::
 
