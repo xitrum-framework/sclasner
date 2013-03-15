@@ -85,19 +85,11 @@ working directory:
 Use with SBT
 ------------
 
-Supported Scala versions: 2.9.2, 2.10.0
-
-Ex:
+Supported Scala versions: 2.10.x
 
 ::
 
   libraryDependencies += "tv.cntt" %% "sclasner" % "1.2"
-
-Or
-
-::
-
-  libraryDependencies += "tv.cntt" % "sclasner_2.9.2" % "1.2"
 
 Sclasner is used in `Xitrum <https://github.com/ngocdaothanh/xitrum>`_.
 
