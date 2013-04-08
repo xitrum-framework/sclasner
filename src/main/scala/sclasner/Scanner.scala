@@ -35,7 +35,10 @@ object Scanner {
         deserialize(cacheFile)
       } catch {
         case NonFatal(e) =>
+          println("Could not deserialize " + cacheFileName)
           e.printStackTrace()
+
+          println("Delete and update " + cacheFileName)
           cacheFile.delete()
           doFoldLeftAndSerialize(files, cacheFile, acc, f)
       }
