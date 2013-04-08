@@ -21,7 +21,7 @@ For example, if you want to load all .txt files:
   import java.io.File
   import sclasner.{FileEntry, Scanner}
 
-  def f(acc: List[(String, String)], entry: FileEntry): List[(String, String)] = {
+  def f(acc: Seq[(String, String)], entry: FileEntry): Seq[(String, String)] = {
     if (entry.relPath.endsWith(".txt")) {
       val fileName = entry.relPath.split(File.pathSeparator).last
       val body     = new String(entry.bytes)
@@ -31,7 +31,7 @@ For example, if you want to load all .txt files:
     }
   }
 
-  val acc = Scanner.foldLeft(List(), f)
+  val acc = Scanner.foldLeft(Seq(), f)
 
 Things in ``FileEntry``:
 
@@ -52,19 +52,22 @@ Things in ``FileEntry``:
 Cache
 -----
 
-One scan may take 10-15 seconds, depending things in your classpath and your computer
-spec etc. Fortunately, because things in classpath do not change frequently,
-you may cache the result to a file and load it later.
+One scan may take 10-15 seconds, depending things in your classpath and your
+computer spec etc. Fortunately, because things in classpath do not change
+frequently, you may cache the result to a file and load it later.
 
 You provide the cache file name to ``foldLeft``:
 
 ::
 
-  val acc = Scanner.foldLeft("txts.sclasner", f)
+  val acc = Scanner.foldLeft("sclasner.cache", Seq(), f)
 
-If txts.sclasner exists, ``f`` will not be run. Otherwise, ``f`` will be run and
-the result will be serialized to txts.sclasner. If you want to force ``f`` to
+If sclasner.cache exists, ``f`` will not be run. Otherwise, ``f`` will be run
+and the result will be serialized to the file. If you want to force ``f`` to
 run, just delete the cache file.
+
+If the cache file cannot be serialized (serialized classes are older than the
+current version), it is deleted and updated.
 
 Note that the result of ``f`` must be serializable.
 
@@ -89,7 +92,7 @@ Supported Scala versions: 2.10.x
 
 ::
 
-  libraryDependencies += "tv.cntt" %% "sclasner" % "1.2"
+  libraryDependencies += "tv.cntt" %% "sclasner" % "1.3"
 
 Sclasner is used in `Xitrum <https://github.com/ngocdaothanh/xitrum>`_.
 
