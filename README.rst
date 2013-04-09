@@ -92,7 +92,7 @@ Supported Scala versions: 2.10.x
 
 ::
 
-  libraryDependencies += "tv.cntt" %% "sclasner" % "1.3"
+  libraryDependencies += "tv.cntt" %% "sclasner" % "1.4"
 
 Sclasner is used in `Xitrum <https://github.com/ngocdaothanh/xitrum>`_.
 
