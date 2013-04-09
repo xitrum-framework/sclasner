@@ -32,12 +32,7 @@ object Scanner {
     val cacheFile = new File(cacheFileName)
     if (cacheFile.exists) {
       try {
-        val ret = deserialize(cacheFile)
-
-        // Force acc to be used to check type cast
-        ret.toString
-
-        ret
+        deserialize[T](cacheFile)  // Bug: deserialize(cacheFile)
       } catch {
         case NonFatal(e) =>
           println("Could not deserialize " + cacheFileName)
