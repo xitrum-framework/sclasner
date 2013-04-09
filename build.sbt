@@ -2,7 +2,7 @@ organization := "tv.cntt"
 
 name         := "sclasner"
 
-version      := "1.3"
+version      := "1.5-SNAPSHOT"
 
 scalaVersion := "2.10.1"
 

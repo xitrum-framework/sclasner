@@ -32,7 +32,12 @@ object Scanner {
     val cacheFile = new File(cacheFileName)
     if (cacheFile.exists) {
       try {
-        deserialize(cacheFile)
+        val ret = deserialize(cacheFile)
+
+        // Force acc to be used to check type cast
+        ret.toString
+
+        ret
       } catch {
         case NonFatal(e) =>
           println("Could not deserialize " + cacheFileName)
@@ -50,11 +55,13 @@ object Scanner {
   // This may throw exception because serialized classes are older than
   // the current version.
   private def deserialize[T](cacheFile: File): T = {
-    val fis  = new FileInputStream(cacheFile)
-    val in   = new ObjectInputStream(fis)
-    val acc2 = in.readObject.asInstanceOf[T]
-    in.close
-    acc2
+    val fis = new FileInputStream(cacheFile)
+    val in  = new ObjectInputStream(fis)
+    try {
+      in.readObject.asInstanceOf[T]
+    } finally {
+      in.close
+    }
   }
 
   private def doFoldLeftAndSerialize[T](files: Seq[File], cacheFile: File, acc: T, f: (T, FileEntry) => T): T = {
