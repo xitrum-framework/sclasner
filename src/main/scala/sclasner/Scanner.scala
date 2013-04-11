@@ -5,7 +5,7 @@ import scala.util.control.NonFatal
 
 object Scanner {
   /** Cache file is tried to be deserialized. If failed, it is deleted and updated. */
-  def foldLeft[T](cacheFileName: String, acc: T, f: (T, FileEntry) => T): T = {
+  def foldLeft[T: Manifest](cacheFileName: String, acc: T, f: (T, FileEntry) => T): T = {
     // "target" (SBT, Maven) and "build" (Gradle) are
     // directories in the current directory
     val targetPath = new File("target").getAbsolutePath
@@ -28,7 +28,7 @@ object Scanner {
 
   //----------------------------------------------------------------------------
 
-  private def deserializeCacheFileWithFallback[T](files: Seq[File], cacheFileName: String, acc: T, f: (T, FileEntry) => T): T = {
+  private def deserializeCacheFileWithFallback[T: Manifest](files: Seq[File], cacheFileName: String, acc: T, f: (T, FileEntry) => T): T = {
     val cacheFile = new File(cacheFileName)
     if (cacheFile.exists) {
       try {
@@ -49,11 +49,19 @@ object Scanner {
 
   // This may throw exception because serialized classes are older than
   // the current version.
-  private def deserialize[T](cacheFile: File): T = {
+  private def deserialize[T: Manifest](cacheFile: File): T = {
     val fis = new FileInputStream(cacheFile)
     val in  = new ObjectInputStream(fis)
     try {
-      in.readObject.asInstanceOf[T]
+      val ret = in.readObject.asInstanceOf[T]
+
+      // Check compatibility
+      val retClass      = ret.getClass
+      val expectedClass = manifest[T].runtimeClass
+      if (!expectedClass.isAssignableFrom(retClass))
+        throw(new Exception("Expected: " + expectedClass + ", got: " + ret.getClass))
+
+      ret
     } finally {
       in.close
     }
