@@ -7,7 +7,10 @@ please see `Reflections <http://code.google.com/p/reflections/>`_.
 With Sclasner, you can:
 
 * Scan all .class files (including those inside .jar files in classpath),
-  then use `Javassist <http://www.javassist.org/>`_ to extract annotations
+  then use
+  `Javassist <http://www.javassist.org/>`_ or
+  `ASM <http://asm.ow2.org/>`_
+  to extract annotations
 * Load all `.po files <https://github.com/ngocdaothanh/scaposer>`_
 * etc.
 
