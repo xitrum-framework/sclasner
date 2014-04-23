@@ -17,6 +17,8 @@ With Sclasner, you can:
 Scan
 ----
 
+See `Scaladoc <http://ngocdaothanh.github.io/sclasner/>`_.
+
 For example, if you want to load all .txt files:
 
 ::
