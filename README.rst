@@ -34,7 +34,7 @@ For example, if you want to load all .txt files:
     }
   }
 
-  val acc = Scanner.foldLeft(Seq(), f)
+  val acc = Scanner.foldLeft(Seq.empty, f)
 
 Things in ``FileEntry``:
 
@@ -63,7 +63,7 @@ You provide the cache file name to ``foldLeft``:
 
 ::
 
-  val acc = Scanner.foldLeft("sclasner.cache", Seq(), f)
+  val acc = Scanner.foldLeft("sclasner.cache", Seq.empty, f)
 
 If sclasner.cache exists, ``f`` will not be run. Otherwise, ``f`` will be run
 and the result will be serialized to the file. If you want to force ``f`` to
