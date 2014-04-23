@@ -1,10 +1,12 @@
-organization := "tv.cntt"
+organization       := "tv.cntt"
 
-name         := "sclasner"
+name               := "sclasner"
 
-version      := "1.7-SNAPSHOT"
+version            := "1.7-SNAPSHOT"
 
-scalaVersion := "2.10.4"
+scalaVersion       := "2.11.0"
+
+crossScalaVersions := Seq("2.11.0", "2.10.4")
 
 scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked")
 
