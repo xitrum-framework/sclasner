@@ -1,6 +1,6 @@
 Sclasner is a classpath scanner written in Scala.
 
-It is intended as a replacement of `Annovention <https://github.com/ngocdaothanh/annovention>`_
+It is intended as a replacement of `Annovention <https://github.com/xitrum-framework/annovention>`_
 and mainly used for standalone JVM applications. If you want a more complex solution,
 please see `Reflections <http://code.google.com/p/reflections/>`_.
 
@@ -11,13 +11,13 @@ With Sclasner, you can:
   `Javassist <http://www.javassist.org/>`_ or
   `ASM <http://asm.ow2.org/>`_
   to extract annotations
-* Load all `.po files <https://github.com/ngocdaothanh/scaposer>`_
+* Load all `.po files <https://github.com/xitrum-framework/scaposer>`_
 * etc.
 
 Scan
 ----
 
-See `Scaladoc <http://ngocdaothanh.github.io/sclasner/>`_.
+See `Scaladoc <http://xitrum-framework.github.io/sclasner/>`_.
 
 For example, if you want to load all .txt files:
 
@@ -99,4 +99,4 @@ Supported Scala versions: 2.11.x, 2.10.x
 
   libraryDependencies += "tv.cntt" %% "sclasner" % "1.6"
 
-Sclasner is used in `Xitrum <https://github.com/ngocdaothanh/xitrum>`_.
+Sclasner is used in `Xitrum <https://github.com/xitrum-framework/xitrum>`_.

@@ -15,23 +15,23 @@ publishArtifact in Test := false
 pomIncludeRepository := { _ => false }
 
 pomExtra := (
-  <url>https://github.com/ngocdaothanh/sclasner</url>
+  <url>https://github.com/xitrum-framework/sclasner</url>
   <licenses>
     <license>
       <name>MIT</name>
-      <url>https://github.com/ngocdaothanh/sclasner/blob/master/MIT-LICENSE</url>
+      <url>https://github.com/xitrum-framework/sclasner/blob/master/MIT-LICENSE</url>
       <distribution>repo</distribution>
     </license>
   </licenses>
   <scm>
-    <url>git@github.com:ngocdaothanh/sclasner.git</url>
-    <connection>scm:git:git@github.com:ngocdaothanh/sclasner.git</connection>
+    <url>git@github.com:xitrum-framework/sclasner.git</url>
+    <connection>scm:git:git@github.com:xitrum-framework/sclasner.git</connection>
   </scm>
   <developers>
     <developer>
       <id>ngocdaothanh</id>
       <name>Ngoc Dao</name>
-      <url>http://cntt.tv</url>
+      <url>https://github.com/ngocdaothanh</url>
     </developer>
   </developers>
 )
