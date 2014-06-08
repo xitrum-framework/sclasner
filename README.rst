@@ -26,7 +26,13 @@ For example, if you want to load all .txt files:
   import java.io.File
   import sclasner.{FileEntry, Scanner}
 
-  def f(acc: Seq[(String, String)], entry: FileEntry): Seq[(String, String)] = {
+  // We define a callback to process each FileEntry:
+  // - The 1st argument is an accumulator to gather process results for each entry.
+  // - The 2nd argument is each entry.
+  // - The result of this callback will be passed to as the accumulator (the
+  //   1st argument) to the next call.
+  // - When all entries have been visited, the accumulator will be returned.
+  def entryProcessor(acc: Seq[(String, String)], entry: FileEntry): Seq[(String, String)] = {
     if (entry.relPath.endsWith(".txt")) {
       val fileName = entry.relPath.split(File.pathSeparator).last
       val body     = new String(entry.bytes)
@@ -36,23 +42,29 @@ For example, if you want to load all .txt files:
     }
   }
 
-  val acc = Scanner.foldLeft(Seq.empty, f)
+  // We actually do the scan:
+  // - The 1st argument is the initial value of the accumulator.
+  // - The 2nd argument is the callback above.
+  val acc = Scanner.foldLeft(Seq.empty, entryProcessor)
 
 Things in ``FileEntry``:
 
 * ``container: File``, may be a directory or a JAR file in classpath.
   You may call ``container.isDirectory`` or ``container.isFile``.
-* ``relPath: String``, path to the file you want to check, relative to ``container``.
-* ``bytes: Array[Byte]``, body of the file ``relPath`` points to.
+  Inside each container, there may be multiple items, represented by the two
+  below.
+* ``relPath: String``, path to the file you want to check, relative to the
+  ``container`` above.
+* ``bytes: Array[Byte]``, body of the file the ``relPath`` above points to.
   This is a lazy val, accessing the first time will actually read the file from
-  disk. But because reading from disk is slow, you should avoid accessing
+  disk. Because reading from disk is slow, you should avoid accessing
   ``bytes`` if you don't have to.
 
-``foldLeft`` will accummulate and return results from ``f``:
+Signature of ``Scanner.foldLeft``:
 
 ::
 
-  foldLeft[T](acc: T, f: (T, FileEntry) => T): T
+  foldLeft[T](acc: T, entryProcessor: (T, FileEntry) => T): T
 
 Cache
 -----
@@ -65,16 +77,17 @@ You provide the cache file name to ``foldLeft``:
 
 ::
 
-  val acc = Scanner.foldLeft("sclasner.cache", Seq.empty, f)
+  val acc = Scanner.foldLeft("sclasner.cache", Seq.empty, entryProcessor)
 
-If sclasner.cache exists, ``f`` will not be run. Otherwise, ``f`` will be run
-and the result will be serialized to the file. If you want to force ``f`` to
-run, just delete the cache file.
+If sclasner.cache exists, ``entryProcessor`` will not be run. Otherwise,
+``entryProcessor`` will be run and the result will be serialized to the file.
+If you want to force ``entryProcessor`` to run, just delete the cache file.
 
-If the cache file cannot be serialized (serialized classes are older than the
-current version), it is deleted and updated.
+If the cache file cannot be successfully deserialized (for example, serialized
+classes are older than the current version of the classes), it will be automatically
+deleted and updated (``entryProcessor`` will be run).
 
-Note that the result of ``f`` must be serializable.
+For the result of ``entryProcessor`` to be written to file, it must be serializable.
 
 Cache in development mode
 -------------------------
@@ -82,13 +95,15 @@ Cache in development mode
 Suppose you are using SBT, Maven, or Gradle.
 
 While developing, you normally do not want to cache the result of processing
-the ``target`` (SBT, Maven) directory or ``build`` (Gradle) in the current
-working directory:
+the directory ``target`` (SBT, Maven) or ``build`` (Gradle) in the current
+working directory.
+
+Sclasner's behavior:
 
 * If ``container`` is a subdirectory of ``target`` or ``build``, the result of
   processing that ``container`` will not be cached.
 * When loading the cache file, if a ``container`` is a subdirectory of
-  ``target`` or ``build``, ``f`` will be run for that ``container``.
+  ``target`` or ``build``, ``entryProcessor`` will be run for that ``container``.
 
 Use with SBT
 ------------

@@ -5,7 +5,7 @@ import scala.util.control.NonFatal
 
 object Scanner {
   /** Cache file is tried to be deserialized. If failed, it is deleted and updated. */
-  def foldLeft[T: Manifest](cacheFileName: String, acc: T, f: (T, FileEntry) => T): T = {
+  def foldLeft[T: Manifest](cacheFileName: String, acc: T, entryProcessor: (T, FileEntry) => T): T = {
     // "target" (SBT, Maven) and "build" (Gradle) are
     // directories in the current directory
     val targetPath = new File("target").getAbsolutePath
@@ -17,18 +17,23 @@ object Scanner {
       path.startsWith(targetPath) || path.startsWith(buildPath)
     }
 
-    val acc2 = deserializeCacheFileWithFallback(others, cacheFileName, acc, f)
-    doFoldLeft(subtargets, acc2, f)
+    val acc2 = deserializeCacheFileWithFallback(others, cacheFileName, acc, entryProcessor)
+    doFoldLeft(subtargets, acc2, entryProcessor)
   }
 
-  def foldLeft[T](acc: T, f: (T, FileEntry) => T): T = {
+  def foldLeft[T](acc: T, entryProcessor: (T, FileEntry) => T): T = {
     val files = Discoverer.files
-    doFoldLeft(files, acc, f)
+    doFoldLeft(files, acc, entryProcessor)
   }
 
   //----------------------------------------------------------------------------
 
-  private def deserializeCacheFileWithFallback[T: Manifest](files: Seq[File], cacheFileName: String, acc: T, f: (T, FileEntry) => T): T = {
+  private def deserializeCacheFileWithFallback[T: Manifest](
+    files:          Seq[File],
+    cacheFileName:  String,
+    acc:            T,
+    entryProcessor: (T, FileEntry) => T
+  ): T = {
     val cacheFile = new File(cacheFileName)
     if (cacheFile.exists) {
       try {
@@ -40,10 +45,10 @@ object Scanner {
 
           println("Delete and update " + cacheFileName)
           cacheFile.delete()
-          doFoldLeftAndSerialize(files, cacheFile, acc, f)
+          doFoldLeftAndSerialize(files, cacheFile, acc, entryProcessor)
       }
     } else {
-      doFoldLeftAndSerialize(files, cacheFile, acc, f)
+      doFoldLeftAndSerialize(files, cacheFile, acc, entryProcessor)
     }
   }
 
@@ -67,8 +72,13 @@ object Scanner {
     }
   }
 
-  private def doFoldLeftAndSerialize[T](files: Seq[File], cacheFile: File, acc: T, f: (T, FileEntry) => T): T = {
-    val acc2 = doFoldLeft(files, acc, f)
+  private def doFoldLeftAndSerialize[T](
+    files:          Seq[File],
+    cacheFile:      File,
+    acc:            T,
+    entryProcessor: (T, FileEntry) => T
+  ): T = {
+    val acc2 = doFoldLeft(files, acc, entryProcessor)
     val fos  = new FileOutputStream(cacheFile)
     val out  = new ObjectOutputStream(fos)
     out.writeObject(acc2)
@@ -76,9 +86,16 @@ object Scanner {
     acc2
   }
 
-  private def doFoldLeft[T](files: Seq[File], acc: T, f: (T, FileEntry) => T): T = {
+  private def doFoldLeft[T](
+    files:          Seq[File],
+    acc:            T,
+    entryProcessor: (T, FileEntry) => T
+  ): T = {
     files.foldLeft(acc) { (acc2, file) =>
-      if (file.isDirectory) Loader.forDir(file, acc2, f) else Loader.forJar(file, acc2, f)
+      if (file.isDirectory)
+        Loader.forDir(file, acc2, entryProcessor)
+      else
+        Loader.forJar(file, acc2, entryProcessor)
     }
   }
 }

@@ -30,7 +30,7 @@ object Discoverer {
 
   // See http://code.google.com/p/reflections/source/browse/trunk/reflections/src/main/java/org/reflections/util/ClasspathHelper.java?r=129
   private lazy val urlsForClassLoader: Set[URL] = {
-    val builder = new SetBuilder[URL, Set[URL]](Set())
+    val builder = new SetBuilder[URL, Set[URL]](Set.empty)
     var loader  = Thread.currentThread.getContextClassLoader
 
     while (loader != null) {
@@ -45,7 +45,7 @@ object Discoverer {
   }
 
   private lazy val urlsForClasspath: Set[URL] = {
-    val builder   = new SetBuilder[URL, Set[URL]](Set())
+    val builder   = new SetBuilder[URL, Set[URL]](Set.empty)
     val classpath = System.getProperty("java.class.path")
     val tokenizer = new StringTokenizer(classpath, File.pathSeparator)
 
