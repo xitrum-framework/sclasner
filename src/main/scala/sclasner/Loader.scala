@@ -20,11 +20,11 @@ object Loader {
         acc2 = f(acc2, fileEntry)
       }
 
-      zip.closeEntry
+      zip.closeEntry()
       entry = zip.getNextEntry
     }
 
-    zip.close
+    zip.close()
     acc2
   }
 
@@ -39,7 +39,7 @@ object Loader {
         val bytesf  = () => {
           val is    = new FileInputStream(file)
           val bytes = readInputStream(is)
-          is.close
+          is.close()
           bytes
         }
         val fileEntry = new FileEntry(container, relPath, bytesf)

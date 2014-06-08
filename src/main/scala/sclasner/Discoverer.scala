@@ -11,7 +11,7 @@ object Discoverer {
   // Use lazy to avoid Null Pointer Exception
 
   /** Each File should point to a directory or a .jar/.zip file. */
-  lazy val files: List[File] = {
+  lazy val containers: List[File] = {
     // Convert to List to prevent careless bug because Set#map returns a Set
     val urls = (urlsForClassLoader ++ urlsForClasspath).toList
 

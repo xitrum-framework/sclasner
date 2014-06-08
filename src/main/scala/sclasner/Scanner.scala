@@ -11,25 +11,25 @@ object Scanner {
     val targetPath = new File("target").getAbsolutePath
     val buildPath  = new File("build").getAbsolutePath
 
-    val files = Discoverer.files
-    val (subtargets, others) = files.partition { file =>
+    val containers = Discoverer.containers
+    val (noncachables, cachables) = containers.partition { file =>
       val path = file.getAbsolutePath
       path.startsWith(targetPath) || path.startsWith(buildPath)
     }
 
-    val acc2 = deserializeCacheFileWithFallback(others, cacheFileName, acc, entryProcessor)
-    doFoldLeft(subtargets, acc2, entryProcessor)
+    val acc2 = deserializeCacheFileWithFallback(cachables, cacheFileName, acc, entryProcessor)
+    doFoldLeft(noncachables, acc2, entryProcessor)
   }
 
   def foldLeft[T](acc: T, entryProcessor: (T, FileEntry) => T): T = {
-    val files = Discoverer.files
-    doFoldLeft(files, acc, entryProcessor)
+    val containers = Discoverer.containers
+    doFoldLeft(containers, acc, entryProcessor)
   }
 
   //----------------------------------------------------------------------------
 
   private def deserializeCacheFileWithFallback[T: Manifest](
-    files:          Seq[File],
+    containers:     Seq[File],
     cacheFileName:  String,
     acc:            T,
     entryProcessor: (T, FileEntry) => T
@@ -45,10 +45,10 @@ object Scanner {
 
           println("Delete and update " + cacheFileName)
           cacheFile.delete()
-          doFoldLeftAndSerialize(files, cacheFile, acc, entryProcessor)
+          doFoldLeftAndSerialize(containers, cacheFile, acc, entryProcessor)
       }
     } else {
-      doFoldLeftAndSerialize(files, cacheFile, acc, entryProcessor)
+      doFoldLeftAndSerialize(containers, cacheFile, acc, entryProcessor)
     }
   }
 
@@ -68,34 +68,34 @@ object Scanner {
 
       ret
     } finally {
-      in.close
+      in.close()
     }
   }
 
   private def doFoldLeftAndSerialize[T](
-    files:          Seq[File],
+    containers:     Seq[File],
     cacheFile:      File,
     acc:            T,
     entryProcessor: (T, FileEntry) => T
   ): T = {
-    val acc2 = doFoldLeft(files, acc, entryProcessor)
+    val acc2 = doFoldLeft(containers, acc, entryProcessor)
     val fos  = new FileOutputStream(cacheFile)
     val out  = new ObjectOutputStream(fos)
     out.writeObject(acc2)
-    out.close
+    out.close()
     acc2
   }
 
   private def doFoldLeft[T](
-    files:          Seq[File],
+    containers:     Seq[File],
     acc:            T,
     entryProcessor: (T, FileEntry) => T
   ): T = {
-    files.foldLeft(acc) { (acc2, file) =>
-      if (file.isDirectory)
-        Loader.forDir(file, acc2, entryProcessor)
+    containers.foldLeft(acc) { (acc2, container) =>
+      if (container.isDirectory)
+        Loader.forDir(container, acc2, entryProcessor)
       else
-        Loader.forJar(file, acc2, entryProcessor)
+        Loader.forJar(container, acc2, entryProcessor)
     }
   }
 }
