@@ -4,7 +4,7 @@ import java.io.File
 import java.net.{URL, URLClassLoader, URLDecoder}
 import java.util.StringTokenizer
 
-import scala.collection.mutable.{SetBuilder}
+import scala.collection.mutable.SetBuilder
 
 // See the source code of https://github.com/ngocdaothanh/annovention
 object Discoverer {
