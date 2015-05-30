@@ -6,6 +6,12 @@ import scala.util.control.NonFatal
 object Scanner {
   /** Cache file is tried to be deserialized. If failed, it is deleted and updated. */
   def foldLeft[T: Manifest](cacheFileName: String, acc: T, entryProcessor: (T, FileEntry) => T): T = {
+    val file = new File(cacheFileName)
+    foldLeft(file, acc, entryProcessor)
+  }
+
+  /** Cache file is tried to be deserialized. If failed, it is deleted and updated. */
+  def foldLeft[T: Manifest](cacheFile: File, acc: T, entryProcessor: (T, FileEntry) => T): T = {
     // "target" (SBT, Maven) and "build" (Gradle) are
     // directories in the current directory
     val targetPath = new File("target").getAbsolutePath
@@ -17,7 +23,7 @@ object Scanner {
       path.startsWith(targetPath) || path.startsWith(buildPath)
     }
 
-    val acc2 = deserializeCacheFileWithFallback(cachables, cacheFileName, acc, entryProcessor)
+    val acc2 = deserializeCacheFileWithFallback(cachables, cacheFile, acc, entryProcessor)
     doFoldLeft(noncachables, acc2, entryProcessor)
   }
 
@@ -30,20 +36,19 @@ object Scanner {
 
   private def deserializeCacheFileWithFallback[T: Manifest](
     containers:     Seq[File],
-    cacheFileName:  String,
+    cacheFile:      File,
     acc:            T,
     entryProcessor: (T, FileEntry) => T
   ): T = {
-    val cacheFile = new File(cacheFileName)
     if (cacheFile.exists) {
       try {
         deserialize[T](cacheFile)  // Bug: deserialize(cacheFile)
       } catch {
         case NonFatal(e) =>
-          println("Could not deserialize " + cacheFileName)
+          println("Could not deserialize " + cacheFile)
           e.printStackTrace()
 
-          println("Delete and update " + cacheFileName)
+          println("Delete and update " + cacheFile)
           cacheFile.delete()
           doFoldLeftAndSerialize(containers, cacheFile, acc, entryProcessor)
       }

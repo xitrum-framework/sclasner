@@ -77,6 +77,7 @@ You provide the cache file name to ``foldLeft``:
 
 ::
 
+  // You can use File instead of file name
   val acc = Scanner.foldLeft("sclasner.cache", Seq.empty, entryProcessor)
 
 If sclasner.cache exists, ``entryProcessor`` will not be run. Otherwise,
@@ -112,6 +113,6 @@ Supported Scala versions: 2.11.x, 2.10.x
 
 ::
 
-  libraryDependencies += "tv.cntt" %% "sclasner" % "1.6"
+  libraryDependencies += "tv.cntt" %% "sclasner" % "1.7.0"
 
 Sclasner is used in `Xitrum <https://github.com/xitrum-framework/xitrum>`_.
