@@ -1,3 +1,3 @@
-// Run sbt eclipse to create Eclipse project file.
-// For IntelliJ, use its Scala and SBT plugin.
+// Run sbt eclipse to create Eclipse project.
+// For IntelliJ, use its Scala and SBT plugins.
 addSbtPlugin("com.typesafe.sbteclipse" % "sbteclipse-plugin" % "2.5.0")
