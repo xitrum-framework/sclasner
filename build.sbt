@@ -1,7 +1,7 @@
 organization := "tv.cntt"
 name         := "sclasner"
+version      := "1.7.0-SNAPSHOT"
 
-version            := "1.7.0-SNAPSHOT"
 scalaVersion       := "2.11.6"
 crossScalaVersions := Seq("2.11.6", "2.10.5")
 
@@ -12,8 +12,6 @@ scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked")
 // are run with Java 6
 // java.lang.UnsupportedClassVersionError: Unsupported major.minor version 51.0
 javacOptions ++= Seq("-source", "1.6", "-target", "1.6")
-
-//------------------------------------------------------------------------------
 
 // Skip API doc generation to speedup "publish-local" while developing.
 // Comment out this line when publishing to Sonatype.
