@@ -15,4 +15,4 @@ javacOptions ++= Seq("-source", "1.6", "-target", "1.6")
 
 // Skip API doc generation to speedup "publish-local" while developing.
 // Comment out this line when publishing to Sonatype.
-publishArtifact in (Compile, packageDoc) := false
+//publishArtifact in (Compile, packageDoc) := false
