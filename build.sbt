@@ -2,8 +2,8 @@ organization := "tv.cntt"
 name         := "sclasner"
 version      := "1.7.0-SNAPSHOT"
 
-scalaVersion       := "2.11.6"
-crossScalaVersions := Seq("2.11.6", "2.10.5")
+crossScalaVersions := Seq("2.12.1", "2.11.8", "2.10.6")
+scalaVersion       := "2.12.1"
 
 scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked")
 

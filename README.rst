@@ -109,7 +109,7 @@ Sclasner's behavior:
 Use with SBT
 ------------
 
-Supported Scala versions: 2.11.x, 2.10.x
+Supported Scala versions: 2.12, 2.11, 2.10
 
 ::
 
