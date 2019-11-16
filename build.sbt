@@ -1,18 +1,14 @@
 organization := "tv.cntt"
 name         := "sclasner"
-version      := "1.7.0-SNAPSHOT"
+version      := "1.8.0-SNAPSHOT"
 
-crossScalaVersions := Seq("2.12.1", "2.11.8", "2.10.6")
-scalaVersion       := "2.12.1"
+crossScalaVersions := Seq("2.13.1", "2.12.10")
+scalaVersion       := "2.13.1"
 
 scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked")
 
-// http://www.scala-sbt.org/release/docs/Detailed-Topics/Java-Sources
-// Avoid problem when this lib is built with Java 7 but the projects that use it
-// are run with Java 6
-// java.lang.UnsupportedClassVersionError: Unsupported major.minor version 51.0
-javacOptions ++= Seq("-source", "1.6", "-target", "1.6")
+javacOptions ++= Seq("-source", "1.8", "-target", "1.8")
 
-// Skip API doc generation to speedup "publish-local" while developing.
+// Skip API doc generation to speedup "publishLocal" while developing.
 // Comment out this line when publishing to Sonatype.
-//publishArtifact in (Compile, packageDoc) := false
+publishArtifact in (Compile, packageDoc) := false

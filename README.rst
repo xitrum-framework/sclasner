@@ -109,10 +109,10 @@ Sclasner's behavior:
 Use with SBT
 ------------
 
-Supported Scala versions: 2.12, 2.11, 2.10
+Supported Scala versions: 2.13, 2.12
 
 ::
 
-  libraryDependencies += "tv.cntt" %% "sclasner" % "1.7.0"
+  libraryDependencies += "tv.cntt" %% "sclasner" % "1.8.0"
 
 Sclasner is used in `Xitrum <https://github.com/xitrum-framework/xitrum>`_.

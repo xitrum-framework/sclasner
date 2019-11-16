@@ -4,16 +4,21 @@ Publish to Sonatype
 See:
 https://github.com/sbt/sbt.github.com/blob/gen-master/src/jekyll/using_sonatype.md
 
-1. Copy content of
-     dev/build.sbt.end to the end of build.sbt
-     dev/plugins.sbt.end to the end of project/plugins.sbt
-2. Run ``sbt publish-signed``
-3. Login at https://oss.sonatype.org/ and from "Staging Repositories" select the
-   newly published item, click "Close" then "Release".
-
-This workflow is for others to easily do ``sbt publish-local`` without PGP key.
-Otherwise there will be error:
+Create ~/.sbt/1.0/sonatype.sbt file:
 
 ::
 
-  java.io.FileNotFoundException: ~/.sbt/gpg/secring.asc (No such file or directory)
+  credentials += Credentials("Sonatype Nexus Repository Manager",
+                             "oss.sonatype.org",
+                             "<your username>",
+                             "<your password>")
+
+Then:
+
+1. Copy content of
+     dev/build.sbt.end   to the end of build.sbt
+     dev/plugins.sbt.end to the end of project/plugins.sbt
+2. Run ``sbt publishSigned``. Alternatively you can run ``sbt`` then from SBT
+   command prompt run ``+ publishSigned``.
+3. Login at https://oss.sonatype.org/ and from "Staging Repositories" select the
+   newly published item, click "Close" then "Release".

@@ -4,7 +4,7 @@ import java.io.File
 import java.net.{URL, URLClassLoader, URLDecoder}
 import java.util.StringTokenizer
 
-import scala.collection.mutable.SetBuilder
+import scala.collection.mutable.{HashSet => MHashSet}
 
 // See the source code of https://github.com/ngocdaothanh/annovention
 object Discoverer {
@@ -30,7 +30,7 @@ object Discoverer {
 
   // See http://code.google.com/p/reflections/source/browse/trunk/reflections/src/main/java/org/reflections/util/ClasspathHelper.java?r=129
   private lazy val urlsForClassLoader: Set[URL] = {
-    val builder = new SetBuilder[URL, Set[URL]](Set.empty)
+    val builder = new MHashSet[URL]()
     var loader  = Thread.currentThread.getContextClassLoader
 
     while (loader != null) {
@@ -41,11 +41,11 @@ object Discoverer {
       loader = loader.getParent
     }
 
-    builder.result
+    builder.toSet
   }
 
   private lazy val urlsForClasspath: Set[URL] = {
-    val builder   = new SetBuilder[URL, Set[URL]](Set.empty)
+    val builder   = new MHashSet[URL]()
     val classpath = System.getProperty("java.class.path")
     val tokenizer = new StringTokenizer(classpath, File.pathSeparator)
 
@@ -55,6 +55,6 @@ object Discoverer {
       builder += file.toURI.toURL
     }
 
-    builder.result
+    builder.toSet
   }
 }
