@@ -2,16 +2,17 @@ package sclasner
 
 import java.io.{File, FileInputStream, FileOutputStream, ObjectInputStream, ObjectOutputStream}
 import scala.util.control.NonFatal
+import scala.reflect.ClassTag
 
 object Scanner {
   /** Cache file is tried to be deserialized. If failed, it is deleted and updated. */
-  def foldLeft[T: Manifest](cacheFileName: String, acc: T, entryProcessor: (T, FileEntry) => T): T = {
+  def foldLeft[T: ClassTag](cacheFileName: String, acc: T, entryProcessor: (T, FileEntry) => T): T = {
     val file = new File(cacheFileName)
     foldLeft(file, acc, entryProcessor)
   }
 
   /** Cache file is tried to be deserialized. If failed, it is deleted and updated. */
-  def foldLeft[T: Manifest](cacheFile: File, acc: T, entryProcessor: (T, FileEntry) => T): T = {
+  def foldLeft[T: ClassTag](cacheFile: File, acc: T, entryProcessor: (T, FileEntry) => T): T = {
     // "target" (SBT, Maven) and "build" (Gradle) are
     // directories in the current directory
     val targetPath = new File("target").getAbsolutePath
@@ -34,7 +35,7 @@ object Scanner {
 
   //----------------------------------------------------------------------------
 
-  private def deserializeCacheFileWithFallback[T: Manifest](
+  private def deserializeCacheFileWithFallback[T: ClassTag](
     containers:     Seq[File],
     cacheFile:      File,
     acc:            T,
@@ -59,7 +60,7 @@ object Scanner {
 
   // This may throw exception because serialized classes are older than
   // the current version.
-  private def deserialize[T: Manifest](cacheFile: File): T = {
+  private def deserialize[T: ClassTag](cacheFile: File): T = {
     val fis = new FileInputStream(cacheFile)
     val in  = new ObjectInputStream(fis)
     try {
@@ -67,7 +68,7 @@ object Scanner {
 
       // Check compatibility
       val retClass      = ret.getClass
-      val expectedClass = manifest[T].runtimeClass
+      val expectedClass = summon[ClassTag[T]].runtimeClass
       if (!expectedClass.isAssignableFrom(retClass))
         throw(new Exception("Expected: " + expectedClass + ", got: " + ret.getClass))
 
