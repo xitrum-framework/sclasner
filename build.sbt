@@ -1,7 +1,8 @@
 organization := "tv.cntt"
 name         := "sclasner"
-version      := "2.0.0-SNAPSHOT"
+version      := "2.0.0"
 
+crossScalaVersions := Seq("3.3.6", "3.7.1")
 scalaVersion := "3.7.1"
 
 libraryDependencies ++= Seq(

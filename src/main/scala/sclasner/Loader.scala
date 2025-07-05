@@ -15,8 +15,9 @@ object Loader {
     var entry = zip.getNextEntry
     while (entry != null) {
       if (!entry.isDirectory) {
-      val bytesf    = () => readInputStream(zip)
-      val fileEntry = new FileEntry(file, entry.getName, bytesf)
+        val bytes     = readInputStream(zip)
+        val bytesf    = () => bytes
+        val fileEntry = new FileEntry(file, entry.getName, bytesf)
         acc2 = f(acc2, fileEntry)
       }
 
@@ -53,11 +54,12 @@ object Loader {
   private val BUFFER_SIZE = 1024
   private def readInputStream(is: InputStream): Array[Byte] = {
     var ret    = Array[Byte]()
-    var buffer = new Array[Byte](BUFFER_SIZE)
+    val buffer = new Array[Byte](BUFFER_SIZE)
 
-    while (is.available > 0) {  // "available" is not always the exact size
-      val bytesRead = is.read(buffer)
+    var bytesRead = is.read(buffer)
+    while (bytesRead != -1) {
       ret = ret ++ buffer.take(bytesRead)
+      bytesRead = is.read(buffer)
     }
 
     ret
